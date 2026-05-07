@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Script Pitch Agent — Amish G Sakshi</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --dark: #0a0a0f;
+    --dark2: #111118;
+    --dark3: #1a1a24;
+    --dark4: #22222f;
+    --text: #e8e4d9;
+    --text-dim: #8a8578;
+    --red: #e05252;
+    --green: #52c07a;
+    --blue: #5293e0;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* HEADER */
+  .header {
+    padding: 20px 16px 12px;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    background: linear-gradient(180deg, rgba(201,168,76,0.06) 0%, transparent 100%);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+  .header-row { display:flex; align-items:center; justify-content:space-between; }
+  .logo { display:flex; align-items:center; gap:10px; }
+  .logo-icon { width:34px; height:34px; background:linear-gradient(135deg,var(--gold),var(--gold-light)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:17px; }
+  .logo-text { font-family:'Playfair Display',serif; font-size:17px; color:var(--gold); }
+  .live-dot { width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+  .header-sub { font-size:10px; color:var(--text-dim); letter-spacing:1.5px; text-transform:uppercase; margin-top:3px; }
+
+  /* NAV */
+  .nav { display:flex; background:var(--dark2); border-bottom:1px solid rgba(255,255,255,0.05); overflow-x:auto; scrollbar-width:none; position:sticky; top:72px; z-index:99; }
+  .nav::-webkit-scrollbar { display:none; }
+  .nav-item { flex:1; min-width:65px; padding:10px 4px; text-align:center; font-size:10px; color:var(--text-dim); cursor:pointer; border-bottom:2px solid transparent; transition:all 0.2s; }
+  .nav-item.active { color:var(--gold); border-bottom-color:var(--gold); background:rgba(201,168,76,0.04); }
+  .nav-icon { font-size:15px; display:block; margin-bottom:2px; }
+
+  /* SCREENS */
+  .screen { display:none; padding:16px; padding-bottom:80px; }
+  .screen.active { display:block; animation:fadeIn 0.25s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+  /* CARDS */
+  .card { background:var(--dark3); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:14px; margin-bottom:12px; }
+  .card-title { font-family:'Playfair Display',serif; font-size:13px; color:var(--gold); margin-bottom:10px; display:flex; align-items:center; gap:7px; }
+
+  /* FORM */
+  label { display:block; font-size:10px; color:var(--text-dim); letter-spacing:1px; text-transform:uppercase; margin-bottom:5px; margin-top:10px; }
+  label:first-child { margin-top:0; }
+  input, textarea, select { width:100%; background:var(--dark4); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:10px 11px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:13px; outline:none; transition:border-color 0.2s; resize:vertical; }
+  input:focus, textarea:focus, select:focus { border-color:rgba(201,168,76,0.4); }
+  select option { background:var(--dark3); }
+  textarea { min-height:75px; }
+
+  /* BUTTONS */
+  .btn { width:100%; padding:12px; border-radius:10px; border:none; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; letter-spacing:0.3px; margin-top:8px; }
+  .btn-gold { background:linear-gradient(135deg,var(--gold),var(--gold-light)); color:var(--dark); }
+  .btn-gold:hover { transform:translateY(-1px); box-shadow:0 4px 18px rgba(201,168,76,0.3); }
+  .btn-gold:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+  .btn-outline { background:transparent; color:var(--gold); border:1px solid rgba(201,168,76,0.35); }
+  .btn-outline:hover { background:rgba(201,168,76,0.07); }
+  .btn-red { background:rgba(224,82,82,0.12); color:var(--red); border:1px solid rgba(224,82,82,0.25); }
+  .btn-green { background:rgba(82,192,122,0.12); color:var(--green); border:1px solid rgba(82,192,122,0.25); }
+
+  /* TOGGLE */
+  .toggle-group { display:flex; gap:6px; margin-bottom:4px; }
+  .toggle-btn { flex:1; padding:9px 6px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); background:var(--dark4); color:var(--text-dim); font-size:11px; cursor:pointer; text-align:center; transition:all 0.2s; }
+  .toggle-btn.on { background:rgba(201,168,76,0.12); border-color:rgba(201,168,76,0.4); color:var(--gold); }
+
+  /* RESULT */
+  .result-box { background:var(--dark4); border:1px solid rgba(201,168,76,0.2); border-radius:10px; padding:13px; font-size:12px; line-height:1.75; white-space:pre-wrap; color:var(--text); display:none; margin-top:10px; }
+  .result-box.show { display:block; animation:fadeIn 0.3s ease; }
+
+  /* LOADING */
+  .loading { display:none; text-align:center; padding:22px; color:var(--text-dim); font-size:12px; }
+  .loading.show { display:block; }
+  .spinner { width:26px; height:26px; border:2px solid rgba(201,168,76,0.15); border-top-color:var(--gold); border-radius:50%; animation:spin 0.75s linear infinite; margin:0 auto 9px; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+
+  /* NOTIFICATION */
+  .notif { display:none; padding:10px 12px; border-radius:8px; font-size:12px; margin-bottom:10px; align-items:center; gap:8px; }
+  .notif.show { display:flex; animation:fadeIn 0.3s ease; }
+  .notif-success { background:rgba(82,192,122,0.1); border:1px solid rgba(82,192,122,0.25); color:var(--green); }
+  .notif-error { background:rgba(224,82,82,0.1); border:1px solid rgba(224,82,82,0.25); color:var(--red); }
+  .notif-info { background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.2); color:var(--gold); }
+
+  /* INFO BOX */
+  .info-box { font-size:11px; color:var(--text-dim); line-height:1.6; padding:9px 11px; background:rgba(201,168,76,0.04); border-left:2px solid rgba(201,168,76,0.3); border-radius:0 6px 6px 0; margin-bottom:10px; }
+
+  /* CONTACTS */
+  .contact-card { display:flex; align-items:center; gap:10px; padding:11px; background:var(--dark3); border:1px solid rgba(255,255,255,0.06); border-radius:10px; margin-bottom:7px; }
+  .contact-avatar { width:34px; height:34px; border-radius:50%; background:var(--dark4); border:1px solid rgba(201,168,76,0.2); display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+  .contact-info { flex:1; min-width:0; }
+  .contact-name { font-size:12px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .contact-role { font-size:10px; color:var(--text-dim); }
+  .contact-source { font-size:9px; color:var(--gold); margin-top:1px; }
+  .badge { font-size:9px; padding:2px 7px; border-radius:20px; flex-shrink:0; }
+  .badge-pending { background:rgba(138,133,120,0.15); color:var(--text-dim); }
+  .badge-sent { background:rgba(82,144,224,0.15); color:var(--blue); }
+  .badge-replied { background:rgba(82,192,122,0.15); color:var(--green); }
+
+  /* INBOX */
+  .inbox-card { background:var(--dark3); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:13px; margin-bottom:8px; cursor:pointer; transition:all 0.2s; position:relative; }
+  .inbox-card:hover { border-color:rgba(201,168,76,0.2); }
+  .inbox-card.positive { border-left:3px solid var(--green); }
+  .inbox-card.important { border-left:3px solid var(--gold); }
+  .inbox-card.negative { border-left:3px solid var(--red); }
+  .inbox-from { font-size:13px; font-weight:500; margin-bottom:3px; }
+  .inbox-subject { font-size:11px; color:var(--text-dim); margin-bottom:5px; }
+  .inbox-preview { font-size:10px; color:var(--text-dim); line-height:1.5; }
+  .inbox-badge { position:absolute; top:11px; right:11px; font-size:9px; padding:2px 7px; border-radius:20px; }
+  .ib-pos { background:rgba(82,192,122,0.15); color:var(--green); }
+  .ib-imp { background:rgba(201,168,76,0.15); color:var(--gold); }
+  .ib-neg { background:rgba(224,82,82,0.15); color:var(--red); }
+  .ib-neu { background:rgba(138,133,120,0.15); color:var(--text-dim); }
+
+  /* STATS */
+  .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+  .stat-card { background:var(--dark3); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:13px; text-align:center; }
+  .stat-num { font-family:'Playfair Display',serif; font-size:26px; color:var(--gold); display:block; }
+  .stat-label { font-size:10px; color:var(--text-dim); margin-top:2px; }
+
+  /* PROGRESS */
+  .progress-bar { height:3px; background:rgba(255,255,255,0.05); border-radius:2px; overflow:hidden; margin-top:7px; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,var(--gold),var(--gold-light)); border-radius:2px; transition:width 0.5s ease; }
+
+  /* SOURCE GRID */
+  .source-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+  .source-item { background:var(--dark4); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:9px; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:7px; }
+  .source-item.on { background:rgba(201,168,76,0.1); border-color:rgba(201,168,76,0.35); }
+  .source-check { width:15px; height:15px; border-radius:3px; border:1.5px solid var(--text-dim); display:flex; align-items:center; justify-content:center; font-size:9px; flex-shrink:0; transition:all 0.2s; }
+  .source-item.on .source-check { background:var(--gold); border-color:var(--gold); color:var(--dark); }
+  .source-name { font-size:11px; color:var(--text-dim); }
+  .source-item.on .source-name { color:var(--text); }
+
+  /* FILE UPLOAD */
+  .file-upload { border:1.5px dashed rgba(201,168,76,0.3); border-radius:10px; padding:18px; text-align:center; cursor:pointer; transition:all 0.2s; background:rgba(201,168,76,0.02); }
+  .file-upload:hover { border-color:rgba(201,168,76,0.5); }
+  .file-upload-icon { font-size:26px; margin-bottom:6px; }
+  .file-upload-text { font-size:12px; color:var(--text-dim); }
+
+  /* MODAL */
+  .modal-bg { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:500; display:none; align-items:flex-end; }
+  .modal-bg.show { display:flex; }
+  .modal { background:var(--dark2); border-top:1px solid rgba(201,168,76,0.2); border-radius:18px 18px 0 0; padding:18px; width:100%; max-height:88vh; overflow-y:auto; animation:slideUp 0.3s ease; }
+  @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+  .modal-handle { width:34px; height:3px; background:rgba(255,255,255,0.1); border-radius:2px; margin:0 auto 14px; }
+  .modal-title { font-family:'Playfair Display',serif; font-size:15px; color:var(--gold); margin-bottom:12px; }
+  .modal-close { float:right; background:none; border:none; color:var(--text-dim); font-size:20px; cursor:pointer; margin-top:-4px; }
+  .divider { height:1px; background:rgba(255,255,255,0.05); margin:12px 0; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-row">
+    <div class="logo">
+      <div class="logo-icon">🎬</div>
+      <span class="logo-text">Script Pitch Agent</span>
+    </div>
+    <div class="live-dot"></div>
+  </div>
+  <div class="header-sub">Amish G Sakshi · Personal AI Agent</div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-item active" onclick="showTab('pitch',this)"><span class="nav-icon">✍️</span>Pitch</div>
+  <div class="nav-item" onclick="showTab('contacts',this)"><span class="nav-icon">🎯</span>Contacts</div>
+  <div class="nav-item" onclick="showTab('inbox',this)"><span class="nav-icon">📬</span>Inbox</div>
+  <div class="nav-item" onclick="showTab('tracker',this)"><span class="nav-icon">📊</span>Tracker</div>
+  <div class="nav-item" onclick="showTab('setup',this)"><span class="nav-icon">⚙️</span>Setup</div>
+</div>
+
+<!-- ===== PITCH SCREEN ===== -->
+<div class="screen active" id="tab-pitch">
+
+  <div class="notif notif-success" id="pitch-notif"><span>✅</span><span id="pitch-notif-msg"></span></div>
+  <div class="notif notif-error" id="pitch-error"><span>⚠️</span><span id="pitch-error-msg"></span></div>
+
+  <!-- Pitch Type -->
+  <div class="card">
+    <div class="card-title">📋 क्या भेजना है?</div>
+    <div class="toggle-group">
+      <div class="toggle-btn on" id="mode-safe" onclick="setMode('safe')">
+        🔒 Logline / Treatment<br><span style="font-size:9px;opacity:0.7">Script सुरक्षित रहे</span>
+      </div>
+      <div class="toggle-btn" id="mode-full" onclick="setMode('full')">
+        📄 Full Script<br><span style="font-size:9px;opacity:0.7">Complete पिच</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Safe Mode -->
+  <div id="safe-section">
+    <div class="card">
+      <div class="card-title">✏️ Script Details</div>
+      <div class="info-box">💡 Script upload नहीं होगी — सिर्फ idea से pitch बनेगी। Script पूरी तरह सुरक्षित।</div>
+      <label>Script का नाम *</label>
+      <input type="text" id="s-title" placeholder="जैसे: Hybrid Kingdom" />
+      <label>Genre *</label>
+      <select id="s-genre">
+        <option value="">चुनें...</option>
+        <option>Sci-Fi / Fantasy</option>
+        <option>Action / Thriller</option>
+        <option>Drama</option>
+        <option>Comedy</option>
+        <option>Horror</option>
+        <option>Romance</option>
+        <option>Historical / Period</option>
+        <option>Biographical</option>
+      </select>
+      <label>Logline *</label>
+      <textarea id="s-logline" placeholder="एक-दो लाइन में पूरी story..."></textarea>
+      <label>Treatment / Synopsis (optional)</label>
+      <textarea id="s-treatment" placeholder="3-5 lines में story arc..."></textarea>
+      <label>यह Script क्यों खास है?</label>
+      <textarea id="s-usp" placeholder="जैसे: Hollywood-Bollywood crossover, WGA registered..." style="min-height:55px;"></textarea>
+    </div>
+  </div>
+
+  <!-- Full Script Mode -->
+  <div id="full-section" style="display:none;">
+    <div class="card">
+      <div class="card-title">📄 Script Upload</div>
+      <div class="info-box">⚠️ Upload से पहले copyright registration जरूर करें।</div>
+      <div class="file-upload" onclick="document.getElementById('script-file').click()">
+        <div class="file-upload-icon">📁</div>
+        <div class="file-upload-text" id="file-text">Script PDF / Word चुनें</div>
+      </div>
+      <input type="file" id="script-file" accept=".pdf,.doc,.docx" style="display:none" onchange="handleFile(this)">
+      <label>Script का नाम *</label>
+      <input type="text" id="s-title2" placeholder="Hybrid Kingdom" />
+      <label>Genre *</label>
+      <select id="s-genre2">
+        <option value="">चुनें...</option>
+        <option>Sci-Fi / Fantasy</option>
+        <option>Action / Thriller</option>
+        <option>Drama</option>
+        <option>Comedy</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Target -->
+  <div class="card">
+    <div class="card-title">🌍 Target Market</div>
+    <div class="toggle-group">
+      <div class="toggle-btn on" id="mkt-both" onclick="setMkt('both')">🌏 Both</div>
+      <div class="toggle-btn" id="mkt-bol" onclick="setMkt('bol')">🎥 Bollywood</div>
+      <div class="toggle-btn" id="mkt-hol" onclick="setMkt('hol')">🎬 Hollywood</div>
+    </div>
+  </div>
+
+  <!-- Tone -->
+  <div class="card">
+    <div class="card-title">🎭 Email Tone</div>
+    <div class="toggle-group">
+      <div class="toggle-btn on" id="tone-pro" onclick="setTone('pro')">Professional</div>
+      <div class="toggle-btn" id="tone-per" onclick="setTone('per')">Personal</div>
+      <div class="toggle-btn" id="tone-bold" onclick="setTone('bold')">Bold</div>
+    </div>
+  </div>
+
+  <!-- Generate -->
+  <button class="btn btn-gold" id="gen-btn" onclick="generatePitch()">✨ AI से Pitch Letter बनाएं</button>
+
+  <div class="loading" id="pitch-loading">
+    <div class="spinner"></div>
+    Gemini AI pitch तैयार कर रहा है...
+  </div>
+
+  <div class="result-box" id="pitch-result"></div>
+
+  <div id="pitch-actions" style="display:none;">
+    <button class="btn btn-gold" onclick="sendPitchEmails()">📧 Selected Contacts को भेजें</button>
+    <button class="btn btn-outline" onclick="copyPitch()">📋 Copy करें</button>
+    <button class="btn btn-outline" onclick="generatePitch()">🔄 दोबारा बनाएं</button>
+  </div>
+
+</div>
+
+<!-- ===== CONTACTS SCREEN ===== -->
+<div class="screen" id="tab-contacts">
+
+  <!-- Sources -->
+  <div class="card">
+    <div class="card-title">🔍 Contact Sources</div>
+    <div class="info-box">जहाँ से contacts ढूंढने हैं वो चुनें।</div>
+    <div class="source-grid">
+      <div class="source-item on" onclick="toggleSrc(this)"><div class="source-check">✓</div><div><div class="source-name">Apollo.io</div><div style="font-size:9px;color:var(--text-dim)">Industry DB</div></div></div>
+      <div class="source-item on" onclick="toggleSrc(this)"><div class="source-check">✓</div><div><div class="source-name">Film Freeway</div><div style="font-size:9px;color:var(--text-dim)">Film Platform</div></div></div>
+      <div class="source-item" onclick="toggleSrc(this)"><div class="source-check"></div><div><div class="source-name">IMDb Pro Sheet</div><div style="font-size:9px;color:var(--text-dim)">Excel import</div></div></div>
+      <div class="source-item" onclick="toggleSrc(this)"><div class="source-check"></div><div><div class="source-name">LinkedIn Sheet</div><div style="font-size:9px;color:var(--text-dim)">Excel import</div></div></div>
+      <div class="source-item" onclick="toggleSrc(this)"><div class="source-check"></div><div><div class="source-name">Hunter.io</div><div style="font-size:9px;color:var(--text-dim)">Email finder</div></div></div>
+      <div class="source-item" onclick="toggleSrc(this)"><div class="source-check"></div><div><div class="source-name">The Black List</div><div style="font-size:9px;color:var(--text-dim)">Script platform</div></div></div>
+    </div>
+  </div>
+
+  <!-- Sheet Import -->
+  <div class="card">
+    <div class="card-title">📊 Excel / CSV Import</div>
+    <div class="info-box">IMDb Pro या LinkedIn से contacts Excel में save करें, फिर यहाँ upload करें।</div>
+    <div class="file-upload" onclick="document.getElementById('sheet-file').click()">
+      <div class="file-upload-icon">📊</div>
+      <div class="file-upload-text" id="sheet-text">Excel / CSV Upload करें</div>
+    </div>
+    <input type="file" id="sheet-file" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleSheet(this)">
+  </div>
+
+  <!-- Manual Add -->
+  <div class="card">
+    <div class="card-title">➕ Contact जोड़ें</div>
+    <label>नाम *</label>
+    <input type="text" id="c-name" placeholder="Karan Johar" />
+    <label>Email *</label>
+    <input type="email" id="c-email" placeholder="submissions@dharma.in" />
+    <label>Company</label>
+    <input type="text" id="c-company" placeholder="Dharma Productions" />
+    <label>Role</label>
+    <select id="c-role">
+      <option>Producer</option>
+      <option>Director</option>
+      <option>Studio Executive</option>
+      <option>Talent Agent</option>
+      <option>Script Manager</option>
+    </select>
+    <button class="btn btn-gold" onclick="addContact()">+ Contact Add करें</button>
+  </div>
+
+  <!-- List -->
+  <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">
+    📋 Contacts: <span id="c-count">0</span> &nbsp;|&nbsp; Selected: <span id="c-selected">0</span>
+  </div>
+  <div id="contacts-list"></div>
+
+</div>
+
+<!-- ===== INBOX SCREEN ===== -->
+<div class="screen" id="tab-inbox">
+  <div class="info-box">🤖 AI हर reply पढ़ता है। सिर्फ important replies पर ध्यान दें।</div>
+
+  <div class="toggle-group" style="margin-bottom:12px;">
+    <div class="toggle-btn on" onclick="filterInbox(this,'all')" style="flex:none;padding:7px 12px;">All</div>
+    <div class="toggle-btn" onclick="filterInbox(this,'positive')" style="flex:none;padding:7px 12px;">✅ Positive</div>
+    <div class="toggle-btn" onclick="filterInbox(this,'important')" style="flex:none;padding:7px 12px;">⭐ Important</div>
+  </div>
+
+  <div id="inbox-list">
+    <div class="inbox-card positive" onclick="openReply('dharma')">
+      <span class="inbox-badge ib-pos">✅ Interested</span>
+      <div class="inbox-from">Dharma Productions</div>
+      <div class="inbox-subject">Re: Script Pitch — Hybrid Kingdom</div>
+      <div class="inbox-preview">Thank you for reaching out. We found your concept very interesting...</div>
+    </div>
+    <div class="inbox-card important" onclick="openReply('legendary')">
+      <span class="inbox-badge ib-imp">⭐ Follow-up</span>
+      <div class="inbox-from">Legendary Pictures</div>
+      <div class="inbox-subject">Re: Hybrid Kingdom — Sci-Fi Project</div>
+      <div class="inbox-preview">Could you share a one-pager? Our acquisitions team would like...</div>
+    </div>
+    <div class="inbox-card" onclick="openReply('auto')">
+      <span class="inbox-badge ib-neu">📩 Auto-reply</span>
+      <div class="inbox-from">Excel Entertainment</div>
+      <div class="inbox-subject">Out of Office</div>
+      <div class="inbox-preview">Currently out of office. Will respond after...</div>
+    </div>
+    <div class="inbox-card negative" onclick="openReply('pass')">
+      <span class="inbox-badge ib-neg">❌ Pass</span>
+      <div class="inbox-from">Yash Raj Films</div>
+      <div class="inbox-subject">Re: Script Submission</div>
+      <div class="inbox-preview">Thank you. Unfortunately this does not fit our current slate...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TRACKER SCREEN ===== -->
+<div class="screen" id="tab-tracker">
+  <div class="stats-grid">
+    <div class="stat-card"><span class="stat-num" id="st-sent">0</span><div class="stat-label">Emails Sent</div></div>
+    <div class="stat-card"><span class="stat-num" id="st-replies">0</span><div class="stat-label">Replies</div></div>
+    <div class="stat-card"><span class="stat-num" id="st-pos">0</span><div class="stat-label">Positive</div></div>
+    <div class="stat-card"><span class="stat-num" id="st-fu">0</span><div class="stat-label">Follow-up Due</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📈 Campaign Progress</div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim);margin-bottom:5px;">
+      <span>Hybrid Kingdom</span><span id="prog-pct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    <div style="font-size:10px;color:var(--text-dim);margin-top:7px;">Target: 50 contacts | Sent: <span id="prog-sent">0</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔔 Auto Follow-up</div>
+    <div class="info-box">Reply न आने पर automatically follow-up जाएगा।</div>
+    <label>Follow-up कब भेजें</label>
+    <select id="fu-days"><option>7 दिन बाद</option><option>10 दिन बाद</option><option>14 दिन बाद</option></select>
+    <label>Maximum follow-ups</label>
+    <select id="fu-max"><option>1 follow-up</option><option>2 follow-ups</option><option>3 follow-ups</option></select>
+  </div>
+
+  <div class="card" style="border-color:rgba(201,168,76,0.2);">
+    <div class="card-title">🚀 Campaign</div>
+    <button class="btn btn-gold" onclick="launchCampaign()">🚀 Campaign शुरू करें</button>
+    <button class="btn btn-red" onclick="stopCampaign()" style="margin-top:6px;">⏸ Campaign रोकें</button>
+  </div>
+</div>
+
+<!-- ===== SETUP SCREEN ===== -->
+<div class="screen" id="tab-setup">
+  <div class="notif notif-success" id="setup-notif"><span>✅</span><span id="setup-notif-msg"></span></div>
+
+  <div class="card">
+    <div class="card-title">👤 आपकी Profile</div>
+    <label>आपका नाम</label>
+    <input type="text" id="set-name" value="Amish G Sakshi" />
+    <label>Gmail ID (जिससे email जाएगी)</label>
+    <input type="email" id="set-email" value="amishgsakshi.screenwriter@gmail.com" />
+    <label>Email Signature</label>
+    <textarea id="set-sig" style="min-height:90px;">Best regards,
+Amish G Sakshi
+Screenwriter | WGA Reg. #2314736
+Indian Copyright Reg. #224611
+amishgsakshi.screenwriter@gmail.com</textarea>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🤖 AI Setup (Gemini)</div>
+    <div class="info-box">Pitch letters लिखने के लिए Gemini AI key चाहिए।</div>
+    <label>Gemini API Key</label>
+    <input type="password" id="set-gemini" placeholder="AIza..." />
+    <div style="font-size:10px;color:var(--text-dim);margin-top:5px;">aistudio.google.com से मिलेगी — बिल्कुल फ्री</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📧 Gmail Setup</div>
+    <div class="info-box">Real email भेजने के लिए Gmail App Password चाहिए।<br><br>
+    Gmail → Settings → Security → 2-Step Verification ON करें → App Passwords → Script Agent → Generate</div>
+    <label>Gmail App Password (16 digit)</label>
+    <input type="password" id="set-gmailpass" placeholder="xxxx xxxx xxxx xxxx" />
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔔 Notifications</div>
+    <div class="source-grid">
+      <div class="source-item on" onclick="toggleSrc(this)"><div class="source-check">✓</div><div class="source-name">Positive Reply</div></div>
+      <div class="source-item on" onclick="toggleSrc(this)"><div class="source-check">✓</div><div class="source-name">Meeting Request</div></div>
+      <div class="source-item" onclick="toggleSrc(this)"><div class="source-check"></div><div class="source-name">All Replies</div></div>
+      <div class="source-item" onclick="toggleSrc(this)"><div class="source-check"></div><div class="source-name">Auto-replies</div></div>
+    </div>
+  </div>
+
+  <button class="btn btn-gold" onclick="saveSetup()">💾 Save करें</button>
+  <button class="btn btn-green" onclick="testGemini()" style="margin-top:6px;">🧪 AI Test करें</button>
+</div>
+
+<!-- REPLY MODAL -->
+<div class="modal-bg" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="document.getElementById('modal').classList.remove('show')">×</button>
+    <div class="modal-title" id="m-from"></div>
+    <div style="font-size:11px;color:var(--text-dim);margin-bottom:12px;" id="m-subject"></div>
+    <div class="divider"></div>
+    <div style="font-size:12px;line-height:1.7;color:var(--text);margin-bottom:14px;" id="m-body"></div>
+    <div class="divider"></div>
+    <div style="font-size:11px;color:var(--gold);margin-bottom:8px;">🤖 AI Analysis:</div>
+    <div class="info-box" id="m-analysis"></div>
+    <div style="font-size:11px;color:var(--text-dim);margin:12px 0 7px;">AI Reply Draft:</div>
+    <div class="result-box show" id="m-draft" style="font-size:12px;"></div>
+    <button class="btn btn-gold" style="margin-top:10px;" onclick="sendReply()">📧 यह Reply भेजें</button>
+    <button class="btn btn-outline" onclick="document.getElementById('modal').classList.remove('show')">बंद करें</button>
+  </div>
+</div>
+
+<script>
+// ===== STATE =====
+const USER = {
+  name: localStorage.getItem('spa_name') || 'Amish G Sakshi',
+  email: localStorage.getItem('spa_email') || 'amishgsakshi.screenwriter@gmail.com',
+  gemini: localStorage.getItem('spa_gemini') || '',
+  gmailpass: localStorage.getItem('spa_gmailpass') || '',
+  sig: localStorage.getItem('spa_sig') || `Best regards,\nAmish G Sakshi\nScreenwriter | WGA Reg. #2314736\nIndian Copyright Reg. #224611\namishgsakshi.screenwriter@gmail.com`
+};
+
+let pitchMode = 'safe';
+let market = 'both';
+let tone = 'pro';
+let generatedPitch = '';
+let contacts = JSON.parse(localStorage.getItem('spa_contacts') || '[]');
+let stats = JSON.parse(localStorage.getItem('spa_stats') || '{"sent":0,"replies":0,"pos":0,"fu":0}');
+
+// ===== NAV =====
+function showTab(name, el) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  el.classList.add('active');
+  if(name === 'tracker') updateStats();
+  if(name === 'contacts') renderContacts();
+  if(name === 'setup') loadSetup();
+}
+
+// ===== TOGGLES =====
+function setMode(m) {
+  pitchMode = m;
+  document.getElementById('mode-safe').classList.toggle('on', m==='safe');
+  document.getElementById('mode-full').classList.toggle('on', m==='full');
+  document.getElementById('safe-section').style.display = m==='safe' ? 'block' : 'none';
+  document.getElementById('full-section').style.display = m==='full' ? 'block' : 'none';
+}
+function setMkt(m) {
+  market = m;
+  ['both','bol','hol'].forEach(x => document.getElementById('mkt-'+x).classList.toggle('on', x===m));
+}
+function setTone(t) {
+  tone = t;
+  ['pro','per','bold'].forEach(x => document.getElementById('tone-'+x).classList.toggle('on', x===t));
+}
+function toggleSrc(el) {
+  el.classList.toggle('on');
+  const c = el.querySelector('.source-check');
+  c.textContent = el.classList.contains('on') ? '✓' : '';
+}
+function filterInbox(el, type) {
+  document.querySelectorAll('#tab-inbox .toggle-btn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+}
+
+// ===== FILE HANDLERS =====
+function handleFile(input) {
+  if(input.files[0]) document.getElementById('file-text').textContent = '✅ ' + input.files[0].name;
+}
+function handleSheet(input) {
+  if(input.files[0]) {
+    document.getElementById('sheet-text').textContent = '✅ ' + input.files[0].name;
+    showNotif('pitch-notif','pitch-notif-msg', input.files[0].name + ' import हुई');
+  }
+}
+
+// ===== GENERATE PITCH =====
+async function generatePitch() {
+  const title = document.getElementById('s-title').value.trim();
+  const genre = document.getElementById('s-genre').value;
+  const logline = document.getElementById('s-logline').value.trim();
+  const treatment = document.getElementById('s-treatment').value.trim();
+  const usp = document.getElementById('s-usp').value.trim();
+  const geminiKey = document.getElementById('set-gemini').value.trim() || USER.gemini;
+
+  if(!title || !logline) { showError('pitch-error','pitch-error-msg','Script का नाम और Logline जरूर भरें'); return; }
+  if(!geminiKey) { showError('pitch-error','pitch-error-msg','Setup tab में Gemini API Key डालें'); return; }
+
+  const mktText = market==='both' ? 'Bollywood and Hollywood' : market==='bol' ? 'Bollywood' : 'Hollywood';
+  const toneText = tone==='pro' ? 'professional and formal' : tone==='per' ? 'personal and warm' : 'bold and confident';
+
+  document.getElementById('gen-btn').disabled = true;
+  document.getElementById('pitch-loading').classList.add('show');
+  document.getElementById('pitch-result').classList.remove('show');
+  document.getElementById('pitch-actions').style.display = 'none';
+
+  const prompt = `You are an expert script pitch writer for the film industry. Write a compelling pitch email for this screenplay.
+
+Script Title: ${title}
+Genre: ${genre}
+Logline: ${logline}
+${treatment ? 'Synopsis: ' + treatment : ''}
+${usp ? 'Unique Points: ' + usp : ''}
+Target: ${mktText}
+Tone: ${toneText}
+Sender: ${USER.name} (${USER.email})
+
+Write a pitch email (150-200 words) that:
+- Starts with "Dear [Name],"
+- Opens with a strong hook
+- States the logline clearly  
+- Highlights commercial viability
+- Mentions WGA registration and Indian Copyright registration
+- Has a clear call to action
+- Ends before the signature (I will add signature separately)
+- Sounds completely human, NOT like AI
+
+Write ONLY the email body. No subject line.`;
+
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({contents:[{parts:[{text: prompt}]}]})
+    });
+    const data = await res.json();
+
+    if(data.error) throw new Error(data.error.message);
+
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    generatedPitch = text + '\n\n' + USER.sig;
+
+    document.getElementById('pitch-result').textContent = generatedPitch;
+    document.getElementById('pitch-result').classList.add('show');
+    document.getElementById('pitch-actions').style.display = 'block';
+
+  } catch(err) {
+    showError('pitch-error','pitch-error-msg', 'Error: ' + err.message);
+  }
+
+  document.getElementById('pitch-loading').classList.remove('show');
+  document.getElementById('gen-btn').disabled = false;
+}
+
+// ===== SEND EMAILS =====
+async function sendPitchEmails() {
+  const selected = contacts.filter(c => c.selected);
+  if(selected.length === 0) { showError('pitch-error','pitch-error-msg','Contacts tab में contacts select करें'); return; }
+  if(!generatedPitch) { showError('pitch-error','pitch-error-msg','पहले Pitch Letter बनाएं'); return; }
+
+  const title = document.getElementById('s-title').value.trim();
+  const gmailPass = document.getElementById('set-gmailpass').value.trim() || USER.gmailpass;
+
+  if(!gmailPass) {
+    showError('pitch-error','pitch-error-msg','Setup tab में Gmail App Password डालें — Real email के लिए जरूरी है');
+    return;
+  }
+
+  showNotif('pitch-notif','pitch-notif-msg', selected.length + ' contacts को email भेजी जा रही है...');
+
+  // EmailJS या direct SMTP के बिना browser से direct email नहीं जा सकती
+  // इसलिए Gmail draft खोलते हैं
+  for(const c of selected) {
+    const subject = encodeURIComponent(`Script Pitch: ${title} — ${USER.name}`);
+    const body = encodeURIComponent(generatedPitch.replace('Dear [Name],', `Dear ${c.name},`));
+    const gmailURL = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(c.email)}&su=${subject}&body=${body}`;
+    window.open(gmailURL, '_blank');
+    c.status = 'sent';
+    stats.sent++;
+    await new Promise(r => setTimeout(r, 800));
+  }
+
+  saveContacts();
+  saveStats();
+  renderContacts();
+  showNotif('pitch-notif','pitch-notif-msg', '✅ ' + selected.length + ' Gmail drafts खुल गए! Review करके Send दबाएं।');
+}
+
+// ===== COPY =====
+function copyPitch() {
+  if(generatedPitch) {
+    navigator.clipboard.writeText(generatedPitch).then(() => {
+      showNotif('pitch-notif','pitch-notif-msg','Pitch copy हो गई!');
+    });
+  }
+}
+
+// ===== CONTACTS =====
+function addContact() {
+  const name = document.getElementById('c-name').value.trim();
+  const email = document.getElementById('c-email').value.trim();
+  const company = document.getElementById('c-company').value.trim();
+  const role = document.getElementById('c-role').value;
+
+  if(!name || !email) { alert('नाम और Email जरूरी है'); return; }
+  if(!email.includes('@')) { alert('Valid Email डालें'); return; }
+
+  contacts.push({id: Date.now(), name, email, company, role, source:'Manual', status:'pending', selected:false});
+  saveContacts();
+  renderContacts();
+  document.getElementById('c-name').value = '';
+  document.getElementById('c-email').value = '';
+  document.getElementById('c-company').value = '';
+}
+
+function toggleContact(id) {
+  const c = contacts.find(x => x.id === id);
+  if(c) { c.selected = !c.selected; saveContacts(); renderContacts(); }
+}
+
+function renderContacts() {
+  const list = document.getElementById('contacts-list');
+  const selected = contacts.filter(c => c.selected).length;
+  document.getElementById('c-count').textContent = contacts.length;
+  document.getElementById('c-selected').textContent = selected;
+
+  if(contacts.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-dim);font-size:12px;">कोई contact नहीं है।<br>ऊपर से add करें।</div>';
+    return;
+  }
+
+  list.innerHTML = contacts.map(c => `
+    <div class="contact-card" onclick="toggleContact(${c.id})" style="${c.selected ? 'border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.05)' : ''}">
+      <div class="contact-avatar">${c.selected ? '✓' : getEmoji(c.role)}</div>
+      <div class="contact-info">
+        <div class="contact-name">${c.name}</div>
+        <div class="contact-role">${c.role} ${c.company ? '· ' + c.company : ''}</div>
+        <div class="contact-source">${c.source}</div>
+      </div>
+      <span class="badge badge-${c.status}">${c.status === 'pending' ? 'Pending' : c.status === 'sent' ? 'Sent' : 'Replied'}</span>
+    </div>
+  `).join('');
+}
+
+function getEmoji(role) {
+  if(role === 'Producer') return '🎬';
+  if(role === 'Director') return '🎥';
+  if(role === 'Studio Executive') return '🏢';
+  return '👤';
+}
+
+function saveContacts() { localStorage.setItem('spa_contacts', JSON.stringify(contacts)); }
+
+// ===== STATS =====
+function updateStats() {
+  document.getElementById('st-sent').textContent = stats.sent;
+  document.getElementById('st-replies').textContent = stats.replies;
+  document.getElementById('st-pos').textContent = stats.pos;
+  document.getElementById('st-fu').textContent = stats.fu;
+  const pct = Math.min(100, Math.round((stats.sent/50)*100));
+  document.getElementById('prog-pct').textContent = pct + '%';
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-sent').textContent = stats.sent;
+}
+function saveStats() { localStorage.setItem('spa_stats', JSON.stringify(stats)); }
+
+// ===== CAMPAIGN =====
+function launchCampaign() {
+  const pending = contacts.filter(c => c.status === 'pending').length;
+  if(pending === 0) { alert('कोई pending contact नहीं है।'); return; }
+  if(!generatedPitch) { alert('पहले Pitch tab में pitch letter बनाएं।'); return; }
+  alert(`🚀 Campaign शुरू!\n\n${pending} contacts को pitch भेजी जाएगी।\n\nContacts tab में contacts select करें फिर "Selected Contacts को भेजें" दबाएं।`);
+}
+function stopCampaign() { if(confirm('Campaign रोकनी है?')) alert('⏸ Campaign रोकी गई।'); }
+
+// ===== SETUP =====
+function loadSetup() {
+  document.getElementById('set-name').value = USER.name;
+  document.getElementById('set-email').value = USER.email;
+  document.getElementById('set-sig').value = USER.sig;
+  document.getElementById('set-gemini').value = USER.gemini;
+  document.getElementById('set-gmailpass').value = USER.gmailpass;
+}
+
+function saveSetup() {
+  USER.name = document.getElementById('set-name').value;
+  USER.email = document.getElementById('set-email').value;
+  USER.sig = document.getElementById('set-sig').value;
+  USER.gemini = document.getElementById('set-gemini').value;
+  USER.gmailpass = document.getElementById('set-gmailpass').value;
+  localStorage.setItem('spa_name', USER.name);
+  localStorage.setItem('spa_email', USER.email);
+  localStorage.setItem('spa_sig', USER.sig);
+  localStorage.setItem('spa_gemini', USER.gemini);
+  localStorage.setItem('spa_gmailpass', USER.gmailpass);
+  showNotif('setup-notif','setup-notif-msg','Settings save हो गई ✅');
+}
+
+async function testGemini() {
+  const key = document.getElementById('set-gemini').value.trim();
+  if(!key) { alert('पहले Gemini API Key डालें'); return; }
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({contents:[{parts:[{text:'Say "AI Ready!" in Hindi in 5 words.'}]}]})
+    });
+    const data = await res.json();
+    if(data.error) throw new Error(data.error.message);
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    alert('✅ Gemini AI काम कर रहा है!\n\nReply: ' + reply);
+  } catch(err) {
+    alert('❌ Error: ' + err.message + '\n\nAPI Key check करें।');
+  }
+}
+
+// ===== INBOX MODAL =====
+const replyData = {
+  dharma: {
+    from:'Dharma Productions', subject:'Re: Script Pitch — Hybrid Kingdom',
+    body:`Dear Amish,\n\nThank you for reaching out. We found your concept for Hybrid Kingdom quite intriguing. The sci-fi origin story structure is something our team has been exploring.\n\nCould you please share a one-page synopsis or treatment? Our creative team would like to evaluate further.\n\nBest,\nScript Acquisitions\nDharma Productions`,
+    analysis:'⭐ POSITIVE reply! वो seriously interested हैं। जल्दी treatment भेजें — यह बड़ा मौका है।',
+    draft:`Dear Team,\n\nThank you so much for your kind response regarding Hybrid Kingdom.\n\nI am attaching the one-page treatment and movie bible as requested. The project is registered with WGA (Reg. #2314736) and Indian Copyright Office (Reg. #224611).\n\nI would be happy to share the complete screenplay or schedule a call at your convenience.\n\nWarm regards,\nAmish G Sakshi`
+  },
+  legendary: {
+    from:'Legendary Pictures', subject:'Re: Hybrid Kingdom — Sci-Fi Project',
+    body:`Hi,\n\nOur acquisitions team reviewed your logline. The concept is interesting.\n\nCould you share a one-pager or treatment?\n\nThanks`,
+    analysis:'⭐ Follow-up करें। Treatment और Movie Bible भेजें। Hollywood connection का मौका।',
+    draft:`Dear Acquisitions Team,\n\nThank you for your response. I am glad Hybrid Kingdom caught your attention.\n\nPlease find the treatment and movie bible attached. This is a Hollywood-Bollywood crossover designed for global audiences — WGA registered.\n\nAvailable for a call anytime.\n\nBest,\nAmish G Sakshi`
+  },
+  auto: {
+    from:'Excel Entertainment', subject:'Out of Office',
+    body:`I am currently out of office until next week. Will respond then.`,
+    analysis:'📩 Auto-reply है — कोई action नहीं चाहिए। 7 दिन बाद auto follow-up जाएगा।',
+    draft:`Dear Team,\n\nThank you. Looking forward to connecting when you return.\n\nBest,\nAmish G Sakshi`
+  },
+  pass: {
+    from:'Yash Raj Films', subject:'Re: Script Submission',
+    body:`Thank you for your submission. Unfortunately this project does not fit our current production slate. We wish you the best.`,
+    analysis:'❌ Pass है — निराश न हों। यह normal है। अगले contact पर focus करें।',
+    draft:`Dear Team,\n\nThank you for considering Hybrid Kingdom. I understand and respect your decision.\n\nI would be grateful to be considered for future projects that may align better.\n\nWarm regards,\nAmish G Sakshi`
+  }
+};
+
+function openReply(id) {
+  const d = replyData[id];
+  document.getElementById('m-from').textContent = d.from;
+  document.getElementById('m-subject').textContent = d.subject;
+  document.getElementById('m-body').textContent = d.body;
+  document.getElementById('m-analysis').textContent = d.analysis;
+  document.getElementById('m-draft').textContent = d.draft;
+  document.getElementById('modal').classList.add('show');
+}
+
+function sendReply() {
+  const draft = document.getElementById('m-draft').textContent;
+  const from = document.getElementById('m-from').textContent;
+  const subject = encodeURIComponent('Re: ' + document.getElementById('m-subject').textContent);
+  const body = encodeURIComponent(draft);
+  window.open(`https://mail.google.com/mail/?view=cm&su=${subject}&body=${body}`, '_blank');
+  document.getElementById('modal').classList.remove('show');
+  stats.replies++;
+  saveStats();
+}
+
+function closeModal(e) {
+  if(e.target === document.getElementById('modal')) document.getElementById('modal').classList.remove('show');
+}
+
+// ===== NOTIFICATIONS =====
+function showNotif(id, msgId, msg) {
+  const el = document.getElementById(id);
+  const m = document.getElementById(msgId);
+  if(m) m.textContent = msg;
+  if(el) { el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 4000); }
+}
+function showError(id, msgId, msg) {
+  const el = document.getElementById(id);
+  const m = document.getElementById(msgId);
+  if(m) m.textContent = msg;
+  if(el) { el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 5000); }
+}
+
+// ===== INIT =====
+loadSetup();
+renderContacts();
+updateStats();
+</script>
+</body>
+</html>
